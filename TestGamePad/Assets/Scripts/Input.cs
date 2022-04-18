@@ -7,6 +7,10 @@ using System;
 public class Input : MonoBehaviour
 {
     private bool _connectGamePad = false;
+    private bool _stickDowned = false;
+    private bool _leftInputDowned = false;
+    private bool _rightInputDowned = false;
+
     void Start()
     {
         
@@ -34,6 +38,18 @@ public class Input : MonoBehaviour
             else
             {
                 Debug.Log("左移動");
+            }
+        }
+
+        if(Mathf.Abs(Vertical(_connectGamePad)) == 1.0f)
+        {
+            if(Vertical(_connectGamePad) == 1.0f)
+            {
+                Debug.Log("上移動");
+            }
+            else
+            {
+                Debug.Log("下移動");
             }
         }
 
@@ -71,6 +87,16 @@ public class Input : MonoBehaviour
         {
             Debug.Log("マップボタン押された");
         }
+
+        if(LeftInputDown(_connectGamePad) == true)
+        {
+            Debug.Log("LeftDown");
+        }
+
+        if(RightInputDown(_connectGamePad) == true)
+        {
+            Debug.Log("RightDown");
+        }
     }
 
     private float Horizontal(bool connectedGamePad)
@@ -98,6 +124,91 @@ public class Input : MonoBehaviour
                 return -1.0f;
             }
             else if(Keyboard.current[Key.D].IsPressed())
+            {
+                return 1.0f;
+            }
+            else
+            {
+                return 0.0f;
+            }
+        }
+    }
+
+    private bool LeftInputDown(bool connectedGamePad)
+    {
+        if (connectedGamePad == true)
+        {
+            if(Gamepad.current.leftStick.ReadValue().x == 0.0f)
+            {
+                _leftInputDowned = false;
+            }
+
+            if(_leftInputDowned == false && Gamepad.current.leftStick.ReadValue().x <= -0.95f)
+            {
+                _leftInputDowned = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return Keyboard.current[Key.A].wasPressedThisFrame;
+        }
+    }
+
+    private bool RightInputDown(bool connectedGamePad)
+    {
+        if (connectedGamePad == true)
+        {
+            if (Gamepad.current.leftStick.ReadValue().x == 0.0f)
+            {
+                _rightInputDowned = false;
+            }
+
+            if (_rightInputDowned == false && Gamepad.current.leftStick.ReadValue().x >= 0.95f)
+            {
+                _rightInputDowned = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return Keyboard.current[Key.D].wasPressedThisFrame;
+        }
+    }
+
+    private float Vertical(bool connectedGamePad)
+    {
+        if(connectedGamePad == true)
+        {
+            Vector2 leftStickVec = Gamepad.current.leftStick.ReadValue();
+            if (leftStickVec.y <= -0.9f)
+            {
+                return Math.Sign(leftStickVec.y);
+            }
+            else if (leftStickVec.y >= 0.9f)
+            {
+                return Math.Sign(leftStickVec.y);
+            }
+            else
+            {
+                return 0.0f;
+            }
+        }
+        else
+        {
+            if(Keyboard.current[Key.S].IsActuated())
+            {
+                return -1.0f;
+            }
+            else if(Keyboard.current[Key.W].IsPressed())
             {
                 return 1.0f;
             }
