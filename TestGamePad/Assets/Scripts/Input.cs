@@ -7,9 +7,10 @@ using System;
 public class Input : MonoBehaviour
 {
     private bool _connectGamePad = false;
-    private bool _stickDowned = false;
     private bool _leftInputDowned = false;
     private bool _rightInputDowned = false;
+    private bool _upInputDowned = false;
+    private bool _downInputDowned = false;
 
     void Start()
     {
@@ -29,29 +30,29 @@ public class Input : MonoBehaviour
             _connectGamePad = true;
         }
 
-        if(Mathf.Abs(Horizontal(_connectGamePad)) == 1.0f)
-        {
-            if(Horizontal(_connectGamePad) == 1.0f)
-            {
-                Debug.Log("âEà⁄ìÆ");
-            }
-            else
-            {
-                Debug.Log("ç∂à⁄ìÆ");
-            }
-        }
+        //if(Mathf.Abs(Horizontal(_connectGamePad)) == 1.0f)
+        //{
+        //    if(Horizontal(_connectGamePad) == 1.0f)
+        //    {
+        //        Debug.Log("âEà⁄ìÆ");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("ç∂à⁄ìÆ");
+        //    }
+        //}
 
-        if(Mathf.Abs(Vertical(_connectGamePad)) == 1.0f)
-        {
-            if(Vertical(_connectGamePad) == 1.0f)
-            {
-                Debug.Log("è„à⁄ìÆ");
-            }
-            else
-            {
-                Debug.Log("â∫à⁄ìÆ");
-            }
-        }
+        //if(Mathf.Abs(Vertical(_connectGamePad)) == 1.0f)
+        //{
+        //    if(Vertical(_connectGamePad) == 1.0f)
+        //    {
+        //        Debug.Log("è„à⁄ìÆ");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("â∫à⁄ìÆ");
+        //    }
+        //}
 
         if(RightTriggerDown(_connectGamePad) == true)
         {
@@ -97,6 +98,16 @@ public class Input : MonoBehaviour
         {
             Debug.Log("RightDown");
         }
+
+        if(UpInputDown(_connectGamePad) == true)
+        {
+            Debug.Log("UpDown");
+        }
+
+        if(DownInputDown(_connectGamePad) == true)
+        {
+            Debug.Log("DownDown");
+        }
     }
 
     private float Horizontal(bool connectedGamePad)
@@ -138,14 +149,25 @@ public class Input : MonoBehaviour
     {
         if (connectedGamePad == true)
         {
+            if(Gamepad.current.dpad.left.wasPressedThisFrame)
+            {
+                return true;
+            }
+
             if(Gamepad.current.leftStick.ReadValue().x == 0.0f)
             {
                 _leftInputDowned = false;
+                _rightInputDowned = false;
+                _upInputDowned = false;
+                _downInputDowned = false;
             }
 
-            if(_leftInputDowned == false && Gamepad.current.leftStick.ReadValue().x <= -0.95f)
+            if (_leftInputDowned == false && Gamepad.current.leftStick.ReadValue().x > 0.0f && (Mathf.Abs(Gamepad.current.leftStick.ReadValue().x) > Mathf.Abs(Gamepad.current.leftStick.ReadValue().y)))
             {
                 _leftInputDowned = true;
+                _rightInputDowned = true;
+                _upInputDowned = true;
+                _downInputDowned = true;
                 return true;
             }
             else
@@ -163,14 +185,25 @@ public class Input : MonoBehaviour
     {
         if (connectedGamePad == true)
         {
-            if (Gamepad.current.leftStick.ReadValue().x == 0.0f)
+            if (Gamepad.current.dpad.right.wasPressedThisFrame)
             {
-                _rightInputDowned = false;
+                return true;
             }
 
-            if (_rightInputDowned == false && Gamepad.current.leftStick.ReadValue().x >= 0.95f)
+            if (Gamepad.current.leftStick.ReadValue().x == 0.0f)
             {
+                _leftInputDowned = false;
+                _rightInputDowned = false;
+                _upInputDowned = false;
+                _downInputDowned = false;
+            }
+
+            if (_rightInputDowned == false && Gamepad.current.leftStick.ReadValue().x < 0.0f && (Mathf.Abs(Gamepad.current.leftStick.ReadValue().x) > Mathf.Abs(Gamepad.current.leftStick.ReadValue().y)))
+            {
+                _leftInputDowned = true;
                 _rightInputDowned = true;
+                _upInputDowned = true;
+                _downInputDowned = true;
                 return true;
             }
             else
@@ -216,6 +249,78 @@ public class Input : MonoBehaviour
             {
                 return 0.0f;
             }
+        }
+    }
+
+    private bool UpInputDown(bool connectedGamePad)
+    {
+        if (connectedGamePad == true)
+        {
+            if (Gamepad.current.dpad.up.wasPressedThisFrame)
+            {
+                return true;
+            }
+
+            if (Gamepad.current.leftStick.ReadValue().y == 0.0f)
+            {
+                _leftInputDowned = false;
+                _rightInputDowned = false;
+                _upInputDowned = false;
+                _downInputDowned = false;
+            }
+
+            if (_rightInputDowned == false && Gamepad.current.leftStick.ReadValue().y > 0.0f && (Mathf.Abs(Gamepad.current.leftStick.ReadValue().y) > Mathf.Abs(Gamepad.current.leftStick.ReadValue().x)))
+            {
+                _leftInputDowned = true;
+                _rightInputDowned = true;
+                _upInputDowned = true;
+                _downInputDowned = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return Keyboard.current[Key.W].wasPressedThisFrame;
+        }
+    }
+
+    private bool DownInputDown(bool connectedGamePad)
+    {
+        if (connectedGamePad == true)
+        {
+            if (Gamepad.current.dpad.down.wasPressedThisFrame)
+            {
+                return true;
+            }
+
+            if (Gamepad.current.leftStick.ReadValue().y == 0.0f)
+            {
+                _leftInputDowned = false;
+                _rightInputDowned = false;
+                _upInputDowned = false;
+                _downInputDowned = false;
+            }
+
+            if (_rightInputDowned == false && Gamepad.current.leftStick.ReadValue().y < 0.0f && (Mathf.Abs(Gamepad.current.leftStick.ReadValue().y) > Mathf.Abs(Gamepad.current.leftStick.ReadValue().x)))
+            {
+                _leftInputDowned = true;
+                _rightInputDowned = true;
+                _upInputDowned = true;
+                _downInputDowned = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return Keyboard.current[Key.S].wasPressedThisFrame;
         }
     }
 
