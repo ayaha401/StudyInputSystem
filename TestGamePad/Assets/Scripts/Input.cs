@@ -11,6 +11,7 @@ public class Input : MonoBehaviour
     private bool _rightInputDowned = false;
     private bool _upInputDowned = false;
     private bool _downInputDowned = false;
+    private bool _rightTriggerDowned = false;
 
     void Start()
     {
@@ -107,6 +108,11 @@ public class Input : MonoBehaviour
         if(DownInputDown(_connectGamePad) == true)
         {
             Debug.Log("DownDown");
+        }
+
+        if(RightTriggerUp(_connectGamePad) == true)
+        {
+            Debug.Log("RightTriggerUp");
         }
     }
 
@@ -400,11 +406,41 @@ public class Input : MonoBehaviour
     {
         if (connectedGamePad == true)
         {
-            return (Gamepad.current.rightTrigger.ReadValue() >= 1.0f);
+            if(Gamepad.current.rightTrigger.ReadValue() >= 1.0f)
+            {
+                _rightTriggerDowned = true;
+                return true;
+            }
+            else
+            {
+                //_rightTriggerDowned = false;
+                return false;
+            }
+            //return (Gamepad.current.rightTrigger.ReadValue() >= 1.0f);
         }
         else
         {
             return (Mouse.current.leftButton.IsPressed());
+        }
+    }
+
+    private bool RightTriggerUp(bool connectedGamePad)
+    {
+        if (connectedGamePad == true)
+        {
+            if(_rightTriggerDowned == true && Gamepad.current.rightTrigger.ReadValue() < 0.05f)
+            {
+                _rightTriggerDowned = false;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return Mouse.current.leftButton.wasReleasedThisFrame;
         }
     }
 
